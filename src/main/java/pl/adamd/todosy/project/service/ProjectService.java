@@ -1,0 +1,11 @@
+package pl.adamd.todosy.project.service;
+
+import pl.adamd.todosy.project.model.ProjectEntity;
+
+import java.util.Optional;
+
+public interface ProjectService {
+    Optional<ProjectEntity> getProject(Long id);
+
+    void save(ProjectEntity project);
+}
