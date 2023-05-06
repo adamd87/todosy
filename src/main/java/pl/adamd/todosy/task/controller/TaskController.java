@@ -1,4 +1,4 @@
-package pl.adamd.todosy.task;
+package pl.adamd.todosy.task.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;

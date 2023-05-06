@@ -4,11 +4,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Link;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pl.adamd.todosy.project.ProjectController;
+import pl.adamd.todosy.project.controller.ProjectController;
 import pl.adamd.todosy.project.model.Project;
 import pl.adamd.todosy.project.model.ProjectEntity;
 import pl.adamd.todosy.project.model.mapper.ProjectMapper;
-import pl.adamd.todosy.task.TaskController;
+import pl.adamd.todosy.task.controller.TaskController;
 import pl.adamd.todosy.task.model.TaskEntity;
 
 import java.util.ArrayList;
@@ -30,10 +30,13 @@ public class ProjectViewServiceImpl implements ProjectViewService {
     @Override
     public Project getProjectDetail(Long projectId) {
         Optional<ProjectEntity> projectEntity = projectService.getProject(projectId);
-        Project project = projectEntity.map(projectMapper::mapEntityToDto)
-                                       .orElse(null);
+        if (projectEntity.isPresent()) {
+            Project project = projectEntity.map(projectMapper::mapEntityToDto)
+                                           .orElse(null);
 
-        return getProjectResponse(projectEntity.orElseThrow(), project);
+            return getProjectResponse(projectEntity.orElseThrow(), project);
+        }
+        else return null;
     }
 
     @Override

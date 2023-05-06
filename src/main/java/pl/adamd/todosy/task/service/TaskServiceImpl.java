@@ -3,7 +3,7 @@ package pl.adamd.todosy.task.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.adamd.todosy.task.TaskRepository;
+import pl.adamd.todosy.task.repository.TaskRepository;
 import pl.adamd.todosy.task.model.TaskEntity;
 
 import java.util.Optional;

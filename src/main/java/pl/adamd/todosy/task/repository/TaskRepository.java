@@ -1,4 +1,4 @@
-package pl.adamd.todosy.task;
+package pl.adamd.todosy.task.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;

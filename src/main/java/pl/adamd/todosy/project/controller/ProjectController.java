@@ -1,4 +1,4 @@
-package pl.adamd.todosy.project;
+package pl.adamd.todosy.project.controller;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -14,7 +14,7 @@ public class ProjectController {
     @Autowired
     ProjectViewService projectViewService;
 
-    @GetMapping(value = "/{projectId}", produces = {"application/hal+json"})
+    @GetMapping(value = "/{projectId}")
     public ResponseEntity<Project> getProjectById(@PathVariable Long projectId) {
         return ResponseEntity.ok(projectViewService.getProjectDetail(projectId));
     }

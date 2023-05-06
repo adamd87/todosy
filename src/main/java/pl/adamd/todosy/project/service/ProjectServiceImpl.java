@@ -3,7 +3,7 @@ package pl.adamd.todosy.project.service;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import pl.adamd.todosy.project.ProjectRepository;
+import pl.adamd.todosy.project.repository.ProjectRepository;
 import pl.adamd.todosy.project.model.ProjectEntity;
 
 import java.util.Optional;

@@ -1,4 +1,4 @@
-package pl.adamd.todosy.project;
+package pl.adamd.todosy.project.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
