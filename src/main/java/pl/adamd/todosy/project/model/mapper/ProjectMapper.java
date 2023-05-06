@@ -4,6 +4,7 @@ import pl.adamd.todosy.project.model.ProjectEntity;
 import pl.adamd.todosy.project.model.Project;
 
 public interface ProjectMapper {
-    ProjectEntity mapDtoToEntity(Project project);
     Project mapEntityToDto(ProjectEntity projectEntity);
+
+    ProjectEntity mapDtoToEntitySaveNew(Project project);
 }

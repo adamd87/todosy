@@ -20,7 +20,7 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public void save(TaskEntity task) {
-        taskRepository.save(task);
+    public TaskEntity save(TaskEntity task) {
+        return taskRepository.save(task);
     }
 }

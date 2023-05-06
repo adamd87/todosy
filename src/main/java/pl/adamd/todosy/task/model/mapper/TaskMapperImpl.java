@@ -1,36 +1,40 @@
 package pl.adamd.todosy.task.model.mapper;
 
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
-import pl.adamd.todosy.project.ProjectRepository;
-import pl.adamd.todosy.project.model.ProjectEntity;
-import pl.adamd.todosy.task.model.TaskEntity;
 import pl.adamd.todosy.task.model.Task;
+import pl.adamd.todosy.task.model.TaskEntity;
 
 @Component
-@RequiredArgsConstructor
 public class TaskMapperImpl implements TaskMapper {
-    private final ProjectRepository projectRepository;
-    @Override
-    public TaskEntity mapDtoToEntity(Task task) {
-        if (task != null) {
-            if (task.getProjectId()!= null){
-                ProjectEntity projectEntity = projectRepository.getReferenceById(task.getProjectId());
-                return TaskEntity.builder()
-                                 .name(task.getName())
-                                 .description(task.getDescription())
-                                 .startDate(task.getStartDate())
-                                 .deadline(task.getDeadline())
-                                 .resolveDate(task.getResolveDate())
-                                 .projectEntity(projectEntity)
-                                 .build();
-            }
+
+    public Task mapEntityToDto(TaskEntity taskEntity) {
+        if (taskEntity != null) {
+            return Task.builder()
+                       .id(taskEntity.getId())
+                       .name(taskEntity.getName())
+                       .description(taskEntity.getDescription())
+                       .startDate(taskEntity.getStartDate())
+                       .deadline(taskEntity.getDeadline())
+                       .resolveDate(taskEntity.getResolveDate())
+                       .projectId(taskEntity.getProjectEntity()
+                                            .getId())
+                       .build();
         }
         return null;
     }
 
     @Override
-    public Task mapEntityToDto(TaskEntity taskEntity) {
+    public TaskEntity mapDtoToEntity(Task task) {
+
+        if (task != null) {
+            return TaskEntity.builder()
+                             .name(task.getName())
+                             .description(task.getDescription())
+                             .startDate(task.getStartDate())
+                             .deadline(task.getDeadline())
+                             .resolveDate(task.getResolveDate())
+                             .build();
+        }
         return null;
     }
 }

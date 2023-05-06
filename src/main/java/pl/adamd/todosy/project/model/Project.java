@@ -1,20 +1,20 @@
 package pl.adamd.todosy.project.model;
 
 import lombok.Builder;
-import lombok.Data;
-import pl.adamd.todosy.task.model.Task;
+import lombok.Getter;
+import lombok.Setter;
+import org.springframework.hateoas.RepresentationModel;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
-@Data
 @Builder
-public class Project {
+@Getter
+@Setter
+public class Project extends RepresentationModel<Project> {
 
     private String name;
     private String description;
     private LocalDateTime startDate;
     private LocalDateTime deadline;
     private LocalDateTime resolveDate;
-    private List<Task> taskList;
 }

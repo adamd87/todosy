@@ -6,6 +6,5 @@ import java.util.Optional;
 
 public interface ProjectService {
     Optional<ProjectEntity> getProject(Long id);
-
-    void save(ProjectEntity project);
+    ProjectEntity save(ProjectEntity project);
 }

@@ -1,6 +1,6 @@
 package pl.adamd.todosy.project.service;
 
-import lombok.RequiredArgsConstructor;
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import pl.adamd.todosy.project.ProjectRepository;
@@ -9,11 +9,11 @@ import pl.adamd.todosy.project.model.ProjectEntity;
 import java.util.Optional;
 
 @Service
-@RequiredArgsConstructor
+@AllArgsConstructor
 public class ProjectServiceImpl implements ProjectService {
 
     @Autowired
-    private final ProjectRepository projectRepository;
+    ProjectRepository projectRepository;
 
     @Override
     public Optional<ProjectEntity> getProject(Long id) {
@@ -21,7 +21,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public void save(ProjectEntity project) {
-        projectRepository.save(project);
+    public ProjectEntity save(ProjectEntity project) {
+        return projectRepository.save(project);
     }
 }

@@ -7,5 +7,5 @@ import java.util.Optional;
 public interface TaskService {
     Optional<TaskEntity> getTask(Long id);
 
-    void save(TaskEntity task);
+    TaskEntity save(TaskEntity task);
 }
