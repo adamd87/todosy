@@ -15,12 +15,12 @@ public class ProjectController {
     ProjectViewService projectViewService;
 
     @GetMapping(value = "/{projectId}")
-    public ResponseEntity<Project> getProjectById(@PathVariable Long projectId) {
+    public ResponseEntity<?> getProjectById(@PathVariable Long projectId) {
         return ResponseEntity.ok(projectViewService.getProjectDetail(projectId));
     }
 
     @PostMapping
-    private ResponseEntity<Project> addProject(@RequestBody Project project) {
+    private ResponseEntity<?> addProject(@RequestBody Project project) {
         return ResponseEntity.ok(projectViewService.createNewProject(project));
     }
 

@@ -2,8 +2,11 @@ package pl.adamd.todosy.project.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import pl.adamd.todosy.project.controller.ProjectController;
 import pl.adamd.todosy.project.model.Project;
 import pl.adamd.todosy.project.model.ProjectEntity;
@@ -13,6 +16,7 @@ import pl.adamd.todosy.task.model.TaskEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -28,28 +32,32 @@ public class ProjectViewServiceImpl implements ProjectViewService {
     private final ProjectMapper projectMapper;
 
     @Override
-    public Project getProjectDetail(Long projectId) {
-        Optional<ProjectEntity> projectEntity = projectService.getProject(projectId);
-        if (projectEntity.isPresent()) {
+    public ResponseEntity<?> getProjectDetail(Long projectId) {
+        try {
+            Optional<ProjectEntity> projectEntity = projectService.getProject(projectId);
             Project project = projectEntity.map(projectMapper::mapEntityToDto)
-                                           .orElse(null);
-
-            return getProjectResponse(projectEntity.orElseThrow(), project);
+                                           .orElseThrow();
+            getProjectResponse(projectEntity.get(), project);
+            return ResponseEntity.ok(project);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>("Project not found with projectId " + projectId, HttpStatus.NOT_FOUND);
         }
-        else return null;
     }
 
     @Override
     @Transactional
-    public Project createNewProject(Project project) {
-        ProjectEntity projectEntity = projectService.save(projectMapper.mapDtoToEntitySaveNew(project));
-
-        project = projectMapper.mapEntityToDto(projectEntity);
-
-        return getProjectResponse(projectEntity, project);
+    public ResponseEntity<?> createNewProject(Project project) {
+        try {
+            ProjectEntity projectEntity = projectService.save(projectMapper.mapDtoToEntitySaveNew(project));
+            project = projectMapper.mapEntityToDto(projectEntity);
+            getProjectResponse(projectEntity, project);
+            return ResponseEntity.ok(project);
+        } catch (HttpClientErrorException e) {
+            return new ResponseEntity<>("Save Project process fail: " + e.getMessage(), e.getStatusCode());
+        }
     }
 
-    private static Project getProjectResponse(ProjectEntity projectEntity, Project project) {
+    private static void getProjectResponse(ProjectEntity projectEntity, Project project) {
 
         Link thisProjectLink = linkTo(ProjectController.class).slash(projectEntity.getId())
                                                               .withSelfRel();
@@ -59,7 +67,7 @@ public class ProjectViewServiceImpl implements ProjectViewService {
             Link taskLink = linkTo(methodOn(TaskController.class).getTaskById(task.getId())).withRel("tasks");
             linkList.add(taskLink);
         }
-        return project.add(linkList);
+        project.add(linkList);
     }
 
 

@@ -14,12 +14,12 @@ public class TaskController {
     TaskViewService taskViewService;
 
     @PostMapping(value = "/project/{projectId}/add")
-    public ResponseEntity<Task> addTask(@PathVariable Long projectId, @RequestBody Task task){
+    public ResponseEntity<?> addTask(@PathVariable Long projectId, @RequestBody Task task){
         return ResponseEntity.ok(taskViewService.createNewTask(projectId, task));
     }
 
     @GetMapping(value = "/get/{taskId}")
-    public ResponseEntity<Task> getTaskById(@PathVariable Long taskId) {
+    public ResponseEntity<?> getTaskById(@PathVariable Long taskId) {
         return ResponseEntity.ok(taskViewService.getTaskById(taskId));
 
     }

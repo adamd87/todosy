@@ -1,9 +1,10 @@
 package pl.adamd.todosy.project.service;
 
+import org.springframework.http.ResponseEntity;
 import pl.adamd.todosy.project.model.Project;
 
 public interface ProjectViewService {
-    Project getProjectDetail(Long projectId);
+    ResponseEntity<?> getProjectDetail(Long projectId);
 
-    Project createNewProject(Project project);
+    ResponseEntity<?> createNewProject(Project project);
 }

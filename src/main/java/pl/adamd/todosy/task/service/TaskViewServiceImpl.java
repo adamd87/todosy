@@ -2,6 +2,8 @@ package pl.adamd.todosy.task.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Link;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import pl.adamd.todosy.project.controller.ProjectController;
@@ -13,6 +15,7 @@ import pl.adamd.todosy.task.model.TaskEntity;
 import pl.adamd.todosy.task.model.mapper.TaskMapper;
 
 import java.time.LocalDateTime;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
@@ -31,31 +34,42 @@ public class TaskViewServiceImpl implements TaskViewService {
 
     @Override
     @Transactional
-    public Task createNewTask(Long projectId, Task task) {
+    public ResponseEntity<?> createNewTask(Long projectId, Task task) {
 
-        Task taskResult = null;
-
-        Optional<ProjectEntity> projectEntity = projectService.getProject(projectId);
-        if (projectEntity.isPresent()) {
-            TaskEntity taskEntity = taskMapper.mapDtoToEntity(task);
-            taskEntity.setStartDate(LocalDateTime.now());
-            taskEntity.setProjectEntity(projectEntity.get());
-            taskResult = taskMapper.mapEntityToDto(taskService.save(taskEntity));
-            projectEntity.get()
-                         .getTaskEntityList()
-                         .add(taskEntity);
-            projectService.save(projectEntity.get());
+        try {
+            Optional<ProjectEntity> projectEntity = projectService.getProject(projectId);
+            Task taskResult = addTask(task, projectEntity.orElseThrow());
             getTaskResponse(taskResult);
+            return ResponseEntity.ok()
+                                 .body(taskResult);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>("Project not found with projectId " + projectId, HttpStatus.NOT_FOUND);
         }
+    }
+
+    private Task addTask(Task task, ProjectEntity projectEntity) {
+        TaskEntity taskEntity = taskMapper.mapDtoToEntity(task);
+        taskEntity.setStartDate(LocalDateTime.now());
+        taskEntity.setProjectEntity(projectEntity);
+        Task taskResult = taskMapper.mapEntityToDto(taskService.save(taskEntity));
+        projectEntity.getTaskEntityList()
+                     .add(taskEntity);
+        projectService.save(projectEntity);
         return taskResult;
     }
 
     @Override
-    public Task getTaskById(Long taskId) {
-        Task task = taskMapper.mapEntityToDto(taskService.getTask(taskId)
-                                                         .orElseThrow());
-        getTaskResponse(task);
-        return task;
+    public ResponseEntity<?> getTaskById(Long taskId) {
+        try {
+            Task task = taskMapper.mapEntityToDto(taskService.getTask(taskId)
+                                                             .orElseThrow());
+            getTaskResponse(task);
+            return ResponseEntity.ok(task);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>("Task not found with taskId " + taskId, HttpStatus.NOT_FOUND);
+        }
+
+
     }
 
     private void getTaskResponse(Task taskResult) {
