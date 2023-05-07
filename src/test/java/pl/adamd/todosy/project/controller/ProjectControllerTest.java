@@ -88,7 +88,7 @@ class ProjectControllerTest {
            .andExpect(jsonPath("headers").isEmpty())
            .andExpect(jsonPath("body").value("Project not found with projectId 2"))
            .andExpect(jsonPath("statusCode").value("NOT_FOUND"))
-           .andExpect(jsonPath("statusCodeValue").value("404"));
+           .andExpect(jsonPath("statusCodeValue").value(404));
     }
 
     @Test
