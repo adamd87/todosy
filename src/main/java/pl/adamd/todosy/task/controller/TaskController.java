@@ -22,6 +22,10 @@ public class TaskController {
     @GetMapping(value = "/get/{taskId}")
     public ResponseEntity<?> getTaskById(@PathVariable Long taskId) {
         return ResponseEntity.ok(taskViewService.getTaskById(taskId));
+    }
 
+    @PostMapping(value = "/resolve/{taskId}")
+    public ResponseEntity<?> resolveTaskById(@PathVariable Long taskId) {
+        return ResponseEntity.ok(taskViewService.resolveTask(taskId));
     }
 }

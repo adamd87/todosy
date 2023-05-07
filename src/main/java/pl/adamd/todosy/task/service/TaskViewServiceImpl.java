@@ -14,7 +14,7 @@ import pl.adamd.todosy.task.model.Task;
 import pl.adamd.todosy.task.model.TaskEntity;
 import pl.adamd.todosy.task.model.mapper.TaskMapper;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
@@ -48,11 +48,12 @@ public class TaskViewServiceImpl implements TaskViewService {
 
     private Task addTask(Task task, ProjectEntity projectEntity) {
         TaskEntity taskEntity = taskMapper.mapDtoToEntity(task);
-        taskEntity.setStartDate(LocalDateTime.now());
+        taskEntity.setStartDate(OffsetDateTime.now());
         taskEntity.setProjectEntity(projectEntity);
         Task taskResult = taskMapper.mapEntityToDto(taskService.save(taskEntity));
         projectEntity.getTaskEntityList()
                      .add(taskEntity);
+        projectEntity.setUpdateDate(OffsetDateTime.now());
         projectService.save(projectEntity);
         return taskResult;
     }
@@ -62,6 +63,37 @@ public class TaskViewServiceImpl implements TaskViewService {
         try {
             Task task = taskMapper.mapEntityToDto(taskService.getTask(taskId)
                                                              .orElseThrow());
+            getTaskResponse(task);
+            return ResponseEntity.ok(task);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>("Task not found with taskId " + taskId, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @Override
+    @Transactional
+    public ResponseEntity<?> resolveTask(Long taskId) {
+        try {
+            TaskEntity taskEntity = taskService.getTask(taskId)
+                                               .orElseThrow();
+            if (taskEntity.isResolved()){
+                return new ResponseEntity<>("Task with id " + taskId + " is already resolved", HttpStatus.SEE_OTHER);
+            }
+            taskEntity.setResolveDate(OffsetDateTime.now());
+            taskEntity.setResolved(true);
+            taskService.save(taskEntity);
+            ProjectEntity projectEntity = projectService.getProject(taskEntity.getProjectEntity()
+                                                                              .getId())
+                                                        .orElseThrow();
+            if (projectEntity.getTaskEntityList()
+                             .stream()
+                             .allMatch(TaskEntity::isResolved)) {
+                projectEntity.setAllTasksDone(true);
+            }
+            projectEntity.setUpdateDate(OffsetDateTime.now());
+            projectService.save(projectEntity);
+
+            Task task = taskMapper.mapEntityToDto(taskEntity);
             getTaskResponse(task);
             return ResponseEntity.ok(task);
         } catch (NoSuchElementException e) {

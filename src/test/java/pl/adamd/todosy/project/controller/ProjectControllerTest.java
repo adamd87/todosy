@@ -17,6 +17,8 @@ import pl.adamd.todosy.project.model.ProjectEntity;
 import pl.adamd.todosy.project.repository.ProjectRepository;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -54,6 +56,7 @@ class ProjectControllerTest {
            .andExpect(jsonPath("body.description").value("description"))
            .andExpect(jsonPath("body.deadline").value("2023-05-29"));
     }
+
     @Test
     void GET_second_project_should_return_correct_project_name()
             throws Exception {
@@ -115,6 +118,7 @@ class ProjectControllerTest {
                                  .deadline(LocalDate.of(2023, 5, 29))
                                  .build();
 
+
         mvc.perform(post("/projects").contentType(MediaType.APPLICATION_JSON)
                                      .content(objectMapper.writeValueAsString(project)))
            .andExpect(status().isOk())
@@ -122,9 +126,14 @@ class ProjectControllerTest {
            .andExpect(jsonPath("headers").isEmpty())
            .andExpect(jsonPath("body.name").value("Project1"))
            .andExpect(jsonPath("body.description").value("Description"))
-           .andExpect(jsonPath("body.startDate").isNotEmpty())
+           .andExpect(jsonPath("body.startDate").value(OffsetDateTime.now()
+                                                                     .format(DateTimeFormatter.ofPattern(
+                                                                             "yyyy-MM-dd'T'HH:mm"))))
            .andExpect(jsonPath("body.deadline").value("2023-05-29"))
            .andExpect(jsonPath("body.resolveDate").isEmpty())
+           .andExpect(jsonPath("body.updateDate").isEmpty())
+           .andExpect(jsonPath("body.resolved").value(false))
+           .andExpect(jsonPath("body.allTasksDone").value(false))
            .andExpect(jsonPath("body.links").isArray())
            .andExpect(jsonPath("body.links").isNotEmpty())
            .andExpect(jsonPath("body.links[0].rel").value("self"))

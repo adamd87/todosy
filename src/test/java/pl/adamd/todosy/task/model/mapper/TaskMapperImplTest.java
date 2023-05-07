@@ -8,6 +8,8 @@ import pl.adamd.todosy.task.model.TaskEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 class TaskMapperImplTest {
 
@@ -15,23 +17,25 @@ class TaskMapperImplTest {
         return new TaskMapperImpl();
     }
 
-    ProjectEntity projectEntity = ProjectEntity.builder().id(2L)
+    ProjectEntity projectEntity = ProjectEntity.builder()
+                                               .id(2L)
                                                .build();
 
     Task taskDto = Task.builder()
                        .name("Task DTO")
                        .description("Description DTO")
-                       .startDate(LocalDateTime.now())
+                       .startDate(OffsetDateTime.now())
                        .deadline(LocalDate.of(2023, 12, 4))
-                       .resolveDate(LocalDateTime.of(2022, 11, 4, 12, 0))
+                       .resolveDate(OffsetDateTime.of(LocalDateTime.of(2022, 11, 4, 12, 0), ZoneOffset.UTC))
                        .build();
     TaskEntity taskEntity = TaskEntity.builder()
                                       .id(1L)
                                       .name("Task Entity")
                                       .description("Description Entity")
-                                      .startDate(LocalDateTime.now())
+                                      .startDate(OffsetDateTime.now())
                                       .deadline(LocalDate.of(2015, 7, 25))
-                                      .resolveDate(LocalDateTime.of(2011, 4, 7, 1, 23))
+                                      .resolveDate(
+                                              OffsetDateTime.of(LocalDateTime.of(2011, 4, 7, 1, 23), ZoneOffset.UTC))
                                       .projectEntity(projectEntity)
                                       .build();
 
@@ -42,9 +46,12 @@ class TaskMapperImplTest {
         Assertions.assertEquals(1L, taskDtoResult.getId());
         Assertions.assertEquals("Task Entity", taskDtoResult.getName());
         Assertions.assertEquals("Description Entity", taskDtoResult.getDescription());
-        Assertions.assertEquals(LocalDateTime.now().toLocalDate(), taskDtoResult.getStartDate().toLocalDate());
+        Assertions.assertEquals(OffsetDateTime.now()
+                                             .toLocalDate(), taskDtoResult.getStartDate()
+                                                                          .toLocalDate());
         Assertions.assertEquals(LocalDate.of(2015, 7, 25), taskDtoResult.getDeadline());
-        Assertions.assertEquals(LocalDateTime.of(2011, 4, 7, 1, 23), taskDtoResult.getResolveDate());
+        Assertions.assertEquals(OffsetDateTime.of(LocalDateTime.of(2011, 4, 7, 1, 23), ZoneOffset.UTC),
+                                taskDtoResult.getResolveDate());
         Assertions.assertEquals(2L, taskDtoResult.getProjectId());
 
     }
@@ -55,9 +62,12 @@ class TaskMapperImplTest {
 
         Assertions.assertEquals("Task DTO", taskEntityResult.getName());
         Assertions.assertEquals("Description DTO", taskEntityResult.getDescription());
-        Assertions.assertEquals(LocalDateTime.now().toLocalDate(), taskEntityResult.getStartDate().toLocalDate());
+        Assertions.assertEquals(LocalDateTime.now()
+                                             .toLocalDate(), taskEntityResult.getStartDate()
+                                                                             .toLocalDate());
         Assertions.assertEquals(LocalDate.of(2023, 12, 4), taskEntityResult.getDeadline());
-        Assertions.assertEquals(LocalDateTime.of(2022, 11, 4, 12, 0), taskEntityResult.getResolveDate());
+        Assertions.assertEquals(OffsetDateTime.of(LocalDateTime.of(2022, 11, 4, 12, 0), ZoneOffset.UTC),
+                                taskEntityResult.getResolveDate());
 
     }
 }

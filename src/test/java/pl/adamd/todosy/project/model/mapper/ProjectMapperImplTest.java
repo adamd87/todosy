@@ -7,6 +7,8 @@ import pl.adamd.todosy.project.model.ProjectEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 class ProjectMapperImplTest {
 
@@ -19,14 +21,15 @@ class ProjectMapperImplTest {
                              .name("Project 1")
                              .description("description dto")
                              .deadline(LocalDate.of(2023, 5, 29))
-                             .resolveDate(LocalDateTime.of(2023, 5, 29, 12, 0, 0))
+                             .resolveDate(OffsetDateTime.of(LocalDateTime.of(2023, 5, 29, 12, 0, 0), ZoneOffset.UTC))
                              .build();
 
     ProjectEntity projectEntity = ProjectEntity.builder()
                                                .name("Project Entity")
                                                .description("description")
                                                .deadline(LocalDate.of(2025, 6, 14))
-                                               .resolveDate(LocalDateTime.of(2024, 7, 27, 11, 0, 0))
+                                               .resolveDate(OffsetDateTime.of(LocalDateTime.of(2024, 7, 27, 11, 0, 0),
+                                                                              ZoneOffset.UTC))
                                                .build();
 
 
@@ -38,7 +41,8 @@ class ProjectMapperImplTest {
         Assertions.assertEquals("description", projectResult.getDescription());
         Assertions.assertNull(projectResult.getStartDate());
         Assertions.assertEquals(LocalDate.of(2025, 6, 14), projectResult.getDeadline());
-        Assertions.assertEquals(LocalDateTime.of(2024, 7, 27, 11, 0, 0), projectResult.getResolveDate());
+        Assertions.assertEquals(OffsetDateTime.of(LocalDateTime.of(2024, 7, 27, 11, 0, 0), ZoneOffset.UTC),
+                                projectResult.getResolveDate());
     }
 
     @Test
@@ -51,6 +55,6 @@ class ProjectMapperImplTest {
                                                    .toLocalDate(), LocalDateTime.now()
                                                                                 .toLocalDate());
         Assertions.assertEquals(LocalDate.of(2023, 5, 29), projectEntityResult.getDeadline());
-        Assertions.assertEquals(LocalDateTime.of(2023, 5, 29, 12, 0, 0), projectEntityResult.getResolveDate());
+        Assertions.assertEquals(OffsetDateTime.of(LocalDateTime.of(2023, 5, 29, 12, 0, 0), ZoneOffset.UTC), projectEntityResult.getResolveDate());
     }
 }

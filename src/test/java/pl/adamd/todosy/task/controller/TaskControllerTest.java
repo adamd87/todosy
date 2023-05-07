@@ -19,6 +19,8 @@ import pl.adamd.todosy.task.model.TaskEntity;
 import pl.adamd.todosy.task.repository.TaskRepository;
 
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
+import java.time.format.DateTimeFormatter;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -93,7 +95,9 @@ class TaskControllerTest {
            .andExpect(jsonPath("body.id").value(1))
            .andExpect(jsonPath("body.name").value("Task 1"))
            .andExpect(jsonPath("body.description").value("description"))
-           .andExpect(jsonPath("body.startDate").isNotEmpty())
+           .andExpect(jsonPath("body.startDate").value(OffsetDateTime.now()
+                                                                     .format(DateTimeFormatter.ofPattern(
+                                                                             "yyyy-MM-dd'T'HH:mm"))))
            .andExpect(jsonPath("body.deadline").value("2023-05-29"))
            .andExpect(jsonPath("body.resolveDate").isEmpty())
            .andExpect(jsonPath("body.projectId").value(1))
@@ -122,6 +126,39 @@ class TaskControllerTest {
 
     }
 
+    @Test
+    void POST_resolve_task_by_id_correct()
+            throws Exception {
+        ProjectEntity projectEntity = getProjectEntity();
+        inputTaskToRepo(projectEntity);
+
+        mvc.perform(post("/tasks/resolve/1").contentType(MediaType.APPLICATION_JSON))
+           .andExpect(status().isOk())
+           .andExpect(content().contentTypeCompatibleWith(MediaType.valueOf("application/json")))
+           .andExpect(jsonPath("headers").isEmpty())
+           .andExpect(jsonPath("body.id").value(1))
+           .andExpect(jsonPath("body.name").value("Task 1"))
+           .andExpect(jsonPath("body.description").value("description"))
+           .andExpect(jsonPath("body.startDate").value(OffsetDateTime.now()
+                                                                     .format(DateTimeFormatter.ofPattern(
+                                                                             "yyyy-MM-dd'T'HH:mm"))))
+           .andExpect(jsonPath("body.deadline").value("2023-05-29"))
+           .andExpect(jsonPath("body.resolveDate").value(OffsetDateTime.now()
+                                                                       .format(DateTimeFormatter.ofPattern(
+                                                                               "yyyy-MM-dd'T'HH:mm"))))
+           .andExpect(jsonPath("body.resolved").value(true))
+           .andExpect(jsonPath("body.projectId").value(1))
+           .andExpect(jsonPath("body.links").isArray())
+           .andExpect(jsonPath("body.links").isNotEmpty())
+           .andExpect(jsonPath("body.links[0].rel").value("project"))
+           .andExpect(jsonPath("body.links[0].href").value("http://localhost/projects/1"))
+           .andExpect(jsonPath("body.links[1].rel").value("self"))
+           .andExpect(jsonPath("body.links[1].href").value("http://localhost/tasks/get/1"))
+           .andExpect(jsonPath("statusCode").value("OK"))
+           .andExpect(jsonPath("statusCodeValue").value(200));
+
+    }
+
     private Task getValidTaskToPost() {
         return Task.builder()
                    .name("Task 1")
@@ -139,6 +176,7 @@ class TaskControllerTest {
         taskRepository.save(TaskEntity.builder()
                                       .name("Task 1")
                                       .description("description")
+                                      .startDate(OffsetDateTime.now())
                                       .deadline(LocalDate.of(2023, 5, 29))
                                       .projectEntity(projectEntity)
                                       .build());
@@ -148,7 +186,10 @@ class TaskControllerTest {
         return projectRepository.save(ProjectEntity.builder()
                                                    .name("Project 1")
                                                    .description("description")
+                                                   .startDate(OffsetDateTime.now())
                                                    .deadline(LocalDate.of(2023, 5, 29))
                                                    .build());
     }
+
+
 }

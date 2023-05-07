@@ -15,6 +15,7 @@ public class TaskMapperImpl implements TaskMapper {
                    .startDate(taskEntity.getStartDate())
                    .deadline(taskEntity.getDeadline())
                    .resolveDate(taskEntity.getResolveDate())
+                   .resolved(taskEntity.isResolved())
                    .projectId(taskEntity.getProjectEntity()
                                         .getId())
                    .build();
@@ -28,6 +29,7 @@ public class TaskMapperImpl implements TaskMapper {
                          .startDate(task.getStartDate())
                          .deadline(task.getDeadline())
                          .resolveDate(task.getResolveDate())
+                         .resolved(task.isResolved())
                          .build();
     }
 }

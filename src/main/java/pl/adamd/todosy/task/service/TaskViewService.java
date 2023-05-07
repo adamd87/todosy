@@ -7,4 +7,6 @@ public interface TaskViewService {
     ResponseEntity<?> createNewTask(Long projectId, Task task);
 
     ResponseEntity<?> getTaskById(Long taskId);
+
+    ResponseEntity<?> resolveTask(Long taskId);
 }

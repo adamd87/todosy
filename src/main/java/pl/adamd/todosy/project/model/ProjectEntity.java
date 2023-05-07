@@ -1,16 +1,15 @@
 package pl.adamd.todosy.project.model;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotEmpty;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.NotBlank;
 import pl.adamd.todosy.task.model.TaskEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 @Entity(name = "Project")
@@ -25,9 +24,12 @@ public class ProjectEntity {
     private Long id;
     private String name;
     private String description;
-    private LocalDateTime startDate;
+    private OffsetDateTime startDate;
     private LocalDate deadline;
-    private LocalDateTime resolveDate;
+    private OffsetDateTime updateDate;
+    private OffsetDateTime resolveDate;
+    private boolean resolved;
+    private boolean allTasksDone;
     @OneToMany(mappedBy = "projectEntity")
     private List<TaskEntity> taskEntityList;
 
