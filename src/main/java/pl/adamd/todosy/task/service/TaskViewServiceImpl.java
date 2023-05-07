@@ -40,8 +40,7 @@ public class TaskViewServiceImpl implements TaskViewService {
             Optional<ProjectEntity> projectEntity = projectService.getProject(projectId);
             Task taskResult = addTask(task, projectEntity.orElseThrow());
             getTaskResponse(taskResult);
-            return ResponseEntity.ok()
-                                 .body(taskResult);
+            return ResponseEntity.ok(taskResult);
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>("Project not found with projectId " + projectId, HttpStatus.NOT_FOUND);
         }
@@ -68,8 +67,6 @@ public class TaskViewServiceImpl implements TaskViewService {
         } catch (NoSuchElementException e) {
             return new ResponseEntity<>("Task not found with taskId " + taskId, HttpStatus.NOT_FOUND);
         }
-
-
     }
 
     private void getTaskResponse(Task taskResult) {
@@ -79,6 +76,4 @@ public class TaskViewServiceImpl implements TaskViewService {
         taskResult.add(projectLink);
         taskResult.add(taskSelf);
     }
-
-
 }

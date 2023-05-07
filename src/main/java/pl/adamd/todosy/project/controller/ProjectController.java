@@ -1,5 +1,6 @@
 package pl.adamd.todosy.project.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,7 +21,7 @@ public class ProjectController {
     }
 
     @PostMapping
-    private ResponseEntity<?> addProject(@RequestBody Project project) {
+    private ResponseEntity<?> addProject(@Valid @RequestBody Project project) {
         return ResponseEntity.ok(projectViewService.createNewProject(project));
     }
 

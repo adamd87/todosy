@@ -1,5 +1,6 @@
 package pl.adamd.todosy.task.controller;
 
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,7 +15,7 @@ public class TaskController {
     TaskViewService taskViewService;
 
     @PostMapping(value = "/project/{projectId}/add")
-    public ResponseEntity<?> addTask(@PathVariable Long projectId, @RequestBody Task task){
+    public ResponseEntity<?> addTask(@PathVariable Long projectId, @Valid @RequestBody Task task){
         return ResponseEntity.ok(taskViewService.createNewTask(projectId, task));
     }
 

@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 import pl.adamd.todosy.project.controller.ProjectController;
 import pl.adamd.todosy.project.model.Project;
 import pl.adamd.todosy.project.model.ProjectEntity;
@@ -52,9 +52,10 @@ public class ProjectViewServiceImpl implements ProjectViewService {
             project = projectMapper.mapEntityToDto(projectEntity);
             getProjectResponse(projectEntity, project);
             return ResponseEntity.ok(project);
-        } catch (HttpClientErrorException e) {
+        }  catch (HttpStatusCodeException e) {
             return new ResponseEntity<>("Save Project process fail: " + e.getMessage(), e.getStatusCode());
         }
+
     }
 
     private static void getProjectResponse(ProjectEntity projectEntity, Project project) {
@@ -69,6 +70,5 @@ public class ProjectViewServiceImpl implements ProjectViewService {
         }
         project.add(linkList);
     }
-
 
 }

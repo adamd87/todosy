@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import pl.adamd.todosy.project.model.ProjectEntity;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Entity(name = "Task")
@@ -22,7 +23,7 @@ public class TaskEntity {
     private String name;
     private String description;
     private LocalDateTime startDate;
-    private LocalDateTime deadline;
+    private LocalDate deadline;
     private LocalDateTime resolveDate;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "project_entity_id")

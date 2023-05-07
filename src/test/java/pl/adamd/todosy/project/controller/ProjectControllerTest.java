@@ -38,8 +38,8 @@ class ProjectControllerTest {
 
         mvc.perform(get("/projects/1").contentType(MediaType.APPLICATION_JSON))
            .andExpect(status().isOk())
-           .andExpect(content().contentTypeCompatibleWith(MediaType.valueOf("application/hal+json")))
-                .andExpect(jsonPath("name").value("Project 1"));
+           .andExpect(content().contentTypeCompatibleWith(MediaType.valueOf("application/json")))
+                .andExpect(jsonPath("body.name").value("Project 1"));
     }
 
     @Test

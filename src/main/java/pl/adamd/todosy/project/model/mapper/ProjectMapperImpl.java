@@ -13,30 +13,24 @@ public class ProjectMapperImpl implements ProjectMapper {
 
     @Override
     public Project mapEntityToDto(ProjectEntity projectEntity) {
-        if (projectEntity != null) {
-            return Project.builder()
-                          .name(projectEntity.getName())
-                          .description(projectEntity.getDescription())
-                          .startDate(projectEntity.getStartDate())
-                          .deadline(projectEntity.getDeadline())
-                          .resolveDate(projectEntity.getResolveDate())
-                          .build();
-        }
-        return null;
+        return Project.builder()
+                      .name(projectEntity.getName())
+                      .description(projectEntity.getDescription())
+                      .startDate(projectEntity.getStartDate())
+                      .deadline(projectEntity.getDeadline())
+                      .resolveDate(projectEntity.getResolveDate())
+                      .build();
     }
 
     @Override
     public ProjectEntity mapDtoToEntitySaveNew(Project project) {
-        if (project != null) {
-            return ProjectEntity.builder()
-                                .name(project.getName())
-                                .description(project.getDescription())
-                                .startDate(LocalDateTime.now())
-                                .deadline(project.getDeadline())
-                                .resolveDate(project.getResolveDate())
-                                .taskEntityList(new ArrayList<>())
-                                .build();
-        }
-        return null;
+        return ProjectEntity.builder()
+                            .name(project.getName())
+                            .description(project.getDescription())
+                            .startDate(LocalDateTime.now())
+                            .deadline(project.getDeadline())
+                            .resolveDate(project.getResolveDate())
+                            .taskEntityList(new ArrayList<>())
+                            .build();
     }
 }
