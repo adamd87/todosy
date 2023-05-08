@@ -76,7 +76,7 @@ class TaskControllerTest {
            .andExpect(status().isOk())
            .andExpect(content().contentTypeCompatibleWith(MediaType.valueOf("application/json")))
            .andExpect(jsonPath("headers").isEmpty())
-           .andExpect(jsonPath("body").value("Task not found with taskId 2"))
+           .andExpect(jsonPath("body").value("Task not found with taskID: 2"))
            .andExpect(jsonPath("statusCode").value("NOT_FOUND"))
            .andExpect(jsonPath("statusCodeValue").value(404));
     }

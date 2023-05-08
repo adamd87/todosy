@@ -2,7 +2,6 @@ package pl.adamd.todosy.task.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Link;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,10 +12,10 @@ import pl.adamd.todosy.task.controller.TaskController;
 import pl.adamd.todosy.task.model.Task;
 import pl.adamd.todosy.task.model.TaskEntity;
 import pl.adamd.todosy.task.model.mapper.TaskMapper;
+import pl.adamd.todosy.validation.ResponseManager;
 
 import java.time.OffsetDateTime;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -32,17 +31,27 @@ public class TaskViewServiceImpl implements TaskViewService {
 
     private final TaskMapper taskMapper;
 
+    private final ResponseManager responseManager;
+
+    private static final String PROJECT = "project";
+
     @Override
     @Transactional
     public ResponseEntity<?> createNewTask(Long projectId, Task task) {
 
         try {
-            Optional<ProjectEntity> projectEntity = projectService.getProject(projectId);
-            Task taskResult = addTask(task, projectEntity.orElseThrow());
-            getTaskResponse(taskResult);
-            return ResponseEntity.ok(taskResult);
+            ProjectEntity projectEntity = projectService.getProject(projectId)
+                                                        .orElseThrow();
+            if (!projectEntity.isResolved()) {
+                Task taskResult = addTask(task, projectEntity);
+                getTaskResponse(taskResult);
+                return ResponseEntity.ok(taskResult);
+            }
+            else {
+                return responseManager.projectAlreadyResolvedResponseEntity(projectId);
+            }
         } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("Project not found with projectId " + projectId, HttpStatus.NOT_FOUND);
+            return responseManager.projectNotFoundResponseEntity(projectId);
         }
     }
 
@@ -66,7 +75,7 @@ public class TaskViewServiceImpl implements TaskViewService {
             getTaskResponse(task);
             return ResponseEntity.ok(task);
         } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("Task not found with taskId " + taskId, HttpStatus.NOT_FOUND);
+            return responseManager.taskNotFoundResponseEntity(taskId);
         }
     }
 
@@ -76,8 +85,8 @@ public class TaskViewServiceImpl implements TaskViewService {
         try {
             TaskEntity taskEntity = taskService.getTask(taskId)
                                                .orElseThrow();
-            if (taskEntity.isResolved()){
-                return new ResponseEntity<>("Task with id " + taskId + " is already resolved", HttpStatus.SEE_OTHER);
+            if (taskEntity.isResolved()) {
+                return responseManager.taskAlreadyResolvedResponseEntity(taskId);
             }
             taskEntity.setResolveDate(OffsetDateTime.now());
             taskEntity.setResolved(true);
@@ -97,13 +106,13 @@ public class TaskViewServiceImpl implements TaskViewService {
             getTaskResponse(task);
             return ResponseEntity.ok(task);
         } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("Task not found with taskId " + taskId, HttpStatus.NOT_FOUND);
+            return responseManager.taskNotFoundResponseEntity(taskId);
         }
     }
 
     private void getTaskResponse(Task taskResult) {
         Link projectLink =
-                linkTo(methodOn(ProjectController.class).getProjectById(taskResult.getProjectId())).withRel("project");
+                linkTo(methodOn(ProjectController.class).getProjectById(taskResult.getProjectId())).withRel(PROJECT);
         Link taskSelf = linkTo(methodOn(TaskController.class).getTaskById(taskResult.getId())).withSelfRel();
         taskResult.add(projectLink);
         taskResult.add(taskSelf);

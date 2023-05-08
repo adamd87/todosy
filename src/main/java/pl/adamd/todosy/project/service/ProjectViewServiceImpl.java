@@ -2,7 +2,6 @@ package pl.adamd.todosy.project.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.hateoas.Link;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,11 +12,12 @@ import pl.adamd.todosy.project.model.ProjectEntity;
 import pl.adamd.todosy.project.model.mapper.ProjectMapper;
 import pl.adamd.todosy.task.controller.TaskController;
 import pl.adamd.todosy.task.model.TaskEntity;
+import pl.adamd.todosy.validation.ResponseManager;
 
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -31,16 +31,19 @@ public class ProjectViewServiceImpl implements ProjectViewService {
 
     private final ProjectMapper projectMapper;
 
+    private final ResponseManager responseManager;
+
+    private static final String TASKS = "tasks";
+
     @Override
     public ResponseEntity<?> getProjectDetail(Long projectId) {
         try {
-            Optional<ProjectEntity> projectEntity = projectService.getProject(projectId);
-            Project project = projectEntity.map(projectMapper::mapEntityToDto)
-                                           .orElseThrow();
-            getProjectResponse(projectEntity.get(), project);
-            return ResponseEntity.ok(project);
+            ProjectEntity projectEntity = projectService.getProject(projectId)
+                                                        .orElseThrow();
+            return getProjectResponseEntity(projectMapper.mapEntityToDto(projectService.save(projectEntity)),
+                                            projectEntity);
         } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("Project not found with projectId " + projectId, HttpStatus.NOT_FOUND);
+            return responseManager.projectNotFoundResponseEntity(projectId);
         }
     }
 
@@ -49,13 +52,30 @@ public class ProjectViewServiceImpl implements ProjectViewService {
     public ResponseEntity<?> createNewProject(Project project) {
         try {
             ProjectEntity projectEntity = projectService.save(projectMapper.mapDtoToEntitySaveNew(project));
-            project = projectMapper.mapEntityToDto(projectEntity);
-            getProjectResponse(projectEntity, project);
-            return ResponseEntity.ok(project);
-        }  catch (HttpStatusCodeException e) {
-            return new ResponseEntity<>("Save Project process fail: " + e.getMessage(), e.getStatusCode());
+            return getProjectResponseEntity(projectMapper.mapEntityToDto(projectService.save(projectEntity)),
+                                            projectEntity);
+        } catch (HttpStatusCodeException e) {
+            return responseManager.processFailedResponseEntity(e.getMessage(), e.getStatusCode());
         }
+    }
 
+    @Override
+    public ResponseEntity<?> closeProject(Long projectId) {
+        try {
+            ProjectEntity projectEntity = projectService.getProject(projectId)
+                                                        .orElseThrow();
+            projectEntity.setResolveDate(OffsetDateTime.now());
+            projectEntity.setResolved(true);
+            return getProjectResponseEntity(projectMapper.mapEntityToDto(projectService.save(projectEntity)),
+                                            projectEntity);
+        } catch (NoSuchElementException e) {
+            return responseManager.projectNotFoundResponseEntity(projectId);
+        }
+    }
+
+    private ResponseEntity<Project> getProjectResponseEntity(Project project, ProjectEntity projectEntity) {
+        getProjectResponse(projectEntity, project);
+        return ResponseEntity.ok(project);
     }
 
     private static void getProjectResponse(ProjectEntity projectEntity, Project project) {
@@ -65,7 +85,7 @@ public class ProjectViewServiceImpl implements ProjectViewService {
         List<Link> linkList = new ArrayList<>();
         linkList.add(thisProjectLink);
         for (TaskEntity task : projectEntity.getTaskEntityList()) {
-            Link taskLink = linkTo(methodOn(TaskController.class).getTaskById(task.getId())).withRel("tasks");
+            Link taskLink = linkTo(methodOn(TaskController.class).getTaskById(task.getId())).withRel(TASKS);
             linkList.add(taskLink);
         }
         project.add(linkList);

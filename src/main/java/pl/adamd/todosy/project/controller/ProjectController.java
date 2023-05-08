@@ -25,4 +25,9 @@ public class ProjectController {
         return ResponseEntity.ok(projectViewService.createNewProject(project));
     }
 
+    @PostMapping(value = "/close/{projectId}")
+    private ResponseEntity<?> closeProject(@PathVariable Long projectId){
+        return ResponseEntity.ok(projectViewService.closeProject(projectId));
+    }
+
 }

@@ -7,4 +7,6 @@ public interface ProjectViewService {
     ResponseEntity<?> getProjectDetail(Long projectId);
 
     ResponseEntity<?> createNewProject(Project project);
+
+    ResponseEntity<?> closeProject(Long projectId);
 }

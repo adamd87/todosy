@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import pl.adamd.todosy.task.model.TaskEntity;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
 import java.util.List;
 
