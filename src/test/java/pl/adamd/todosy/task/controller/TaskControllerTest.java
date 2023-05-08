@@ -25,6 +25,8 @@ import java.time.format.DateTimeFormatter;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static pl.adamd.todosy.hepler.GeneratorDto.getInvalidTaskToPost;
+import static pl.adamd.todosy.hepler.GeneratorDto.getValidTaskToPost;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK, classes = TodosyApplication.class)
@@ -85,7 +87,7 @@ class TaskControllerTest {
     void POST_correct_request_body_task_should_return_valid_response()
             throws Exception {
         getProjectEntity();
-        Task task = getValidTaskToPost();
+        Task task = getValidTaskToPost("Task 1", "description", 2023, 5, 29);
 
         mvc.perform(post("/tasks/project/1/add").contentType(MediaType.APPLICATION_JSON)
                                                 .content(objectMapper.writeValueAsString(task)))
@@ -159,18 +161,6 @@ class TaskControllerTest {
 
     }
 
-    private Task getValidTaskToPost() {
-        return Task.builder()
-                   .name("Task 1")
-                   .description("description")
-                   .deadline(LocalDate.of(2023, 5, 29))
-                   .build();
-    }
-
-    private Task getInvalidTaskToPost() {
-        return Task.builder()
-                   .build();
-    }
 
     private void inputTaskToRepo(ProjectEntity projectEntity) {
         taskRepository.save(TaskEntity.builder()
