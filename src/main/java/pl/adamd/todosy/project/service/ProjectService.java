@@ -6,5 +6,8 @@ import java.util.Optional;
 
 public interface ProjectService {
     Optional<ProjectEntity> getProject(Long id);
+
     ProjectEntity save(ProjectEntity project);
+
+    boolean deleteProject(ProjectEntity projectEntity);
 }

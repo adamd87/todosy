@@ -9,4 +9,6 @@ public interface ProjectViewService {
     ResponseEntity<?> createNewProject(Project project);
 
     ResponseEntity<?> closeProject(Long projectId);
+
+    ResponseEntity<?> deleteProjectById(Long projectId);
 }

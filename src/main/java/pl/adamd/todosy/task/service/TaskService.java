@@ -8,4 +8,6 @@ public interface TaskService {
     Optional<TaskEntity> getTask(Long id);
 
     TaskEntity save(TaskEntity task);
+
+    void deleteTask(TaskEntity taskEntity);
 }

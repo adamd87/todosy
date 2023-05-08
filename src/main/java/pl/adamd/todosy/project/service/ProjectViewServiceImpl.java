@@ -12,6 +12,7 @@ import pl.adamd.todosy.project.model.ProjectEntity;
 import pl.adamd.todosy.project.model.mapper.ProjectMapper;
 import pl.adamd.todosy.task.controller.TaskController;
 import pl.adamd.todosy.task.model.TaskEntity;
+import pl.adamd.todosy.task.service.TaskService;
 import pl.adamd.todosy.validation.ResponseManager;
 
 import java.time.OffsetDateTime;
@@ -32,6 +33,8 @@ public class ProjectViewServiceImpl implements ProjectViewService {
     private final ProjectMapper projectMapper;
 
     private final ResponseManager responseManager;
+
+    private final TaskService taskService;
 
     private static final String TASKS = "tasks";
 
@@ -68,6 +71,33 @@ public class ProjectViewServiceImpl implements ProjectViewService {
             projectEntity.setResolved(true);
             return getProjectResponseEntity(projectMapper.mapEntityToDto(projectService.save(projectEntity)),
                                             projectEntity);
+        } catch (NoSuchElementException e) {
+            return responseManager.projectNotFoundResponseEntity(projectId);
+        }
+    }
+
+    @Override
+    public ResponseEntity<?> deleteProjectById(Long projectId) {
+        try {
+            ProjectEntity projectEntity = projectService.getProject(projectId)
+                                                        .orElseThrow();
+            if (projectEntity.getTaskEntityList()
+                             .stream()
+                             .allMatch(TaskEntity::isResolved)) {
+                projectEntity.getTaskEntityList()
+                             .forEach(taskService::deleteTask);
+                return ResponseEntity.ok(projectService.deleteProject(projectEntity));
+            }
+            else {
+                List<Long> taskIds = new ArrayList<>();
+                projectEntity.getTaskEntityList()
+                             .forEach(taskEntity -> {
+                                 if (!taskEntity.isResolved()) {
+                                     taskIds.add(taskEntity.getId());
+                                 }
+                             });
+                return responseManager.projectHasOpenTasksResponseEntity(taskIds);
+            }
         } catch (NoSuchElementException e) {
             return responseManager.projectNotFoundResponseEntity(projectId);
         }
