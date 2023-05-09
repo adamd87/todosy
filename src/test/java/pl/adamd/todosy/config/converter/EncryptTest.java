@@ -29,10 +29,10 @@ class EncryptTest {
     private final Long id = 1L;
 
     @Autowired
-    private JdbcTemplate jdbcTemplate;
+    JdbcTemplate jdbcTemplate;
 
     @Autowired
-    private ProjectRepository projectRepository;
+    ProjectRepository projectRepository;
 
     @BeforeEach
     public void setUp() {
@@ -62,7 +62,7 @@ class EncryptTest {
 
     @Test
     public void read_decrypted_should_return_decrypted_value_from_repository() {
-        ProjectEntity projectEntity = projectRepository.findById(1L).orElseThrow();
+        ProjectEntity projectEntity = projectRepository.findById(id).orElseThrow();
         assertThat(projectEntity.getName()).isEqualTo(NAME);
         assertThat(projectEntity.getDescription()).isEqualTo(DESCRIPTION);
     }
