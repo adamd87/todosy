@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import pl.adamd.todosy.config.converter.Encrypt;
 import pl.adamd.todosy.project.model.ProjectEntity;
 
 import java.time.LocalDate;
@@ -20,7 +21,9 @@ public class TaskEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long id;
+    @Convert(converter = Encrypt.class)
     private String name;
+    @Convert(converter = Encrypt.class)
     private String description;
     private OffsetDateTime startDate;
     private LocalDate deadline;
